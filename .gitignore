@@ -1,5 +1,6 @@
-bin/
+wwwroot/Uploads/
+*.db
+gitignore/
+test_console/obj/
 obj/
-.vs/
-*.user
-appsettings.Development.json
+bin/
