@@ -1,15 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# نسخ ملف المشروع وعمل Restore
-COPY ["R3AIA.csproj", "./"]
-RUN dotnet restore "R3AIA.csproj"
-
-# نسخ باقي ملفات المشروع وبنائه
+# نسخ جميع الملفات مرة واحدة لتخطي مشكلة الأسماء
 COPY . .
-RUN dotnet publish "R3AIA.csproj" -c Release -o /app/publish /p:UseAppHost=false
+# عمل استعادة وبناء أوتوماتيكي بدون تحديد اسم الملف
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-# مرحلة التشغيل النهائية
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
