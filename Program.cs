@@ -127,7 +127,13 @@ namespace R3AIA
                 app.UseHttpsRedirection();
             }
 
-            app.UseCors("AllowAll");
+            // تفعيل الـ CORS لتسمح لتطبيق الموبايل بالاتصال بالسيرفر
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin();
+                options.AllowAnyMethod();
+                options.AllowAnyHeader();
+            });
 
             app.UseStaticFiles(new StaticFileOptions
             {
