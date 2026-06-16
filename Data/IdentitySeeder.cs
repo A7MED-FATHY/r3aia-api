@@ -1,0 +1,186 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using R3AIA.Models;
+using static R3AIA.Models.Enums;
+
+namespace R3AIA.Data;
+
+public static class IdentitySeeder
+{
+	public static async Task SeedAsync(this IApplicationBuilder app)
+	{
+		try {
+			using var scope = app.ApplicationServices.CreateScope();
+			var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+			var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+			var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+			Console.WriteLine("--- Starting Data Seeding ---");
+
+			// Seed roles
+			var roles = new[] { "Admin", "Doctor", "Pharmacist", "Volunteer", "Patient", "Companion", "Premium" };
+			foreach (var role in roles)
+			{
+				if (!await roleManager.RoleExistsAsync(role))
+				{
+					Console.WriteLine($"Seeding Role: {role}");
+					await roleManager.CreateAsync(new IdentityRole(role));
+				}
+			}
+
+			// Seed default admin user
+			const string adminEmail = "admin@r3aia.local";
+			var admin = await userManager.FindByEmailAsync(adminEmail);
+			if (admin is null)
+			{
+				Console.WriteLine("Seeding Admin User...");
+				admin = new ApplicationUser
+				{
+					UserName = adminEmail,
+					Email = adminEmail,
+					FullName = "R3AIA Admin",
+					EmailConfirmed = true,
+					UserType = UserType.Admin,
+					IsVerified = true,
+					HasCompletedProfile = true
+				};
+
+				var result = await userManager.CreateAsync(admin, "Admin@12345");
+				if (result.Succeeded)
+				{
+					await userManager.AddToRoleAsync(admin, "Admin");
+				}
+			}
+
+			// Check if seeding is needed
+			var govCount = await dbContext.Governorates.CountAsync();
+			var cityCount = await dbContext.Cities.CountAsync();
+			var specCount = await dbContext.Specialties.CountAsync();
+
+			if (govCount != 27 || cityCount != 150 || specCount != 15)
+			{
+				Console.WriteLine("Data mismatch or empty tables. Forcing re-seed of Governorates, Cities, and Specialties...");
+				
+				/* 
+				// Order matters because of foreign keys
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Patients");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Doctors");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Pharmacies");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Volunteers");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Cities");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Governorates");
+				await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Specialties");
+				*/
+
+				Console.WriteLine("Seeding Governorates, Cities, and Specialties...");
+				var conn = dbContext.Database.GetDbConnection();
+				await conn.OpenAsync();
+
+				// --- Specialties ---
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Specialties ON");
+				var specialties = new[] {
+					"باطنة", "قلب", "أطفال", "عظام", "جراحة عامة", "جلدية", "عيون", "أسنان",
+					"نساء وتوليد", "أنف وأذن وحنجرة", "مسالك بولية", "أعصاب", "نفسية", "أورام", "تغذية"
+				};
+				for (int i = 0; i < specialties.Length; i++)
+				{
+					await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO Specialties (Id, Name) VALUES ({0}, {1})", i + 1, specialties[i]);
+				}
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Specialties OFF");
+				Console.WriteLine("Specialties Seeded.");
+
+				// --- Governorates ---
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Governorates ON");
+				var govs = new[] {
+					(1, "القاهرة"), (2, "الجيزة"), (3, "الإسكندرية"), (4, "القليوبية"), (5, "الشرقية"),
+					(6, "الغربية"), (7, "المنوفية"), (8, "الدقهلية"), (9, "كفر الشيخ"), (10, "البحيرة"),
+					(11, "الإسماعيلية"), (12, "السويس"), (13, "بورسعيد"), (14, "دمياط"), (15, "المنيا"),
+					(16, "أسيوط"), (17, "سوهاج"), (18, "قنا"), (19, "الأقصر"), (20, "أسوان"),
+					(21, "البحر الأحمر"), (22, "مطروح"), (23, "شمال سيناء"), (24, "جنوب سيناء"), (25, "الفيوم"),
+					(26, "بني سويف"), (27, "الوادي الجديد")
+				};
+				foreach (var (id, name) in govs)
+				{
+					await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO Governorates (Id, Name) VALUES ({0}, {1})", id, name);
+				}
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Governorates OFF");
+				Console.WriteLine("Governorates Seeded.");
+
+				// --- Cities ---
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Cities ON");
+				var cities = new[] {
+					// Cairo (1)
+					(1, "مدينة نصر", 1), (2, "المعادي", 1), (3, "الزمالك", 1), (4, "مصر الجديدة", 1), (5, "حلوان", 1), (6, "شبرا", 1), (7, "عين شمس", 1), (8, "المرج", 1), (9, "عابدين", 1), (10, "باب الشعرية", 1), (11, "التجمع الخامس", 1), (12, "القاهرة الجديدة", 1),
+					// Giza (2)
+					(13, "الهرم", 2), (14, "الدقي", 2), (15, "العجوزة", 2), (16, "المهندسين", 2), (17, "فيصل", 2), (18, "إمبابة", 2), (19, "6 أكتوبر", 2), (20, "الشيخ زايد", 2), (21, "البدرشين", 2),
+					// Alexandria (3)
+					(22, "المنتزه", 3), (23, "سموحة", 3), (24, "العجمي", 3), (25, "سيدي بشر", 3), (26, "العصافرة", 3), (27, "الإبراهيمية", 3), (28, "ميامي", 3), (29, "لوران", 3),
+					// Qaliubiya (4)
+					(30, "بنها", 4), (31, "شبرا الخيمة", 4), (32, "القناطر الخيرية", 4), (33, "كفر شكر", 4), (34, "طوخ", 4), (35, "قليوب", 4),
+					// Sharqia (5)
+					(36, "الزقازيق", 5), (37, "العاشر من رمضان", 5), (38, "بلبيس", 5), (39, "منيا القمح", 5), (40, "أبو كبير", 5), (41, "ديرب نجم", 5),
+					// Gharbia (6)
+					(42, "طنطا", 6), (43, "المحلة الكبرى", 6), (44, "كفر الزيات", 6), (45, "زفتى", 6), (46, "السنطة", 6), (47, "بسيون", 6),
+					// Menofia (7)
+					(48, "شبين الكوم", 7), (49, "مينوف", 7), (50, "الشهداء", 7), (51, "تلا", 7), (52, "قويسنا", 7), (53, "أشمون", 7),
+					// Dakahlia (8)
+					(54, "المنصورة", 8), (55, "طلخا", 8), (56, "ميت غمر", 8), (57, "أجا", 8), (58, "دكرنس", 8), (59, "المنزلة", 8), (60, "شربين", 8),
+					// Kafr El Sheikh (9)
+					(61, "كفر الشيخ", 9), (62, "دسوق", 9), (63, "فوه", 9), (64, "بيلا", 9), (65, "مطوبس", 9),
+					// Beheira (10)
+					(66, "دمنهور", 10), (67, "كفر الدوار", 10), (68, "رشيد", 10), (69, "إيتاي البارود", 10), (70, "أبو حمص", 10), (71, "المحمودية", 10),
+					// Ismailia (11)
+					(72, "الإسماعيلية", 11), (73, "فايد", 11), (74, "أبو صوير", 11), (75, "القنطرة شرق", 11), (76, "القنطرة غرب", 11),
+					// Suez (12)
+					(77, "السويس", 12), (78, "عتاقة", 12), (79, "الجناين", 12), (80, "فيصل", 12),
+					// Port Said (13)
+					(81, "بورسعيد", 13), (82, "الشرق", 13), (83, "العرب", 13), (84, "الزهور", 13),
+					// Damietta (14)
+					(85, "دمياط", 14), (86, "رأس البر", 14), (87, "الزرقا", 14), (88, "فارسكور", 14),
+					// Minya (15)
+					(89, "المنيا", 15), (90, "ملوي", 15), (91, "أبو قرقاص", 15), (92, "بني مزار", 15), (93, "سمالوط", 15), (94, "المطاهرة", 15),
+					// Asyut (16)
+					(95, "أسيوط", 16), (96, "ديروط", 16), (97, "منفلوط", 16), (98, "أبنوب", 16), (99, "القوصية", 16), (100, "ساحل سليم", 16),
+					// Sohag (17)
+					(101, "سوهاج", 17), (102, "طهطا", 17), (103, "أخميم", 17), (104, "جرجا", 17), (105, "المراغة", 17), (106, "دار السلام", 17),
+					// Qena (18)
+					(107, "قنا", 18), (108, "نجع حمادي", 18), (109, "دشنا", 18), (110, "أبو تشت", 18), (111, "قوص", 18),
+					// Luxor (19)
+					(112, "الأقصر", 19), (113, "إسنا", 19), (114, "الأرمنت", 19), (115, "القرنة", 19),
+					// Aswan (20)
+					(116, "أسوان", 20), (117, "كوم أمبو", 20), (118, "إدفو", 20), (119, "نصر النوبة", 20),
+					// Red Sea (21)
+					(120, "الغردقة", 21), (121, "سفاجا", 21), (122, "القصير", 21), (123, "مرسى علم", 21),
+					// Matrouh (22)
+					(124, "مرسى مطروح", 22), (125, "الضبعة", 22), (126, "سيوة", 22), (127, "سيدي براني", 22),
+					// North Sinai (23)
+					(128, "العريش", 23), (129, "رفح", 23), (130, "الشيخ زويد", 23), (131, "بئر العبد", 23),
+					// South Sinai (24)
+					(132, "شرم الشيخ", 24), (133, "طابا", 24), (134, "دهب", 24), (135, "نويبع", 24), (136, "أبو رديس", 24),
+					// Fayoum (25)
+					(137, "الفيوم", 25), (138, "يوسف الصديق", 25), (139, "إبشواي", 25), (140, "طامية", 25), (141, "سنورس", 25),
+					// Beni Suef (26)
+					(142, "بني سويف", 26), (143, "الواسطى", 26), (144, "ناصر", 26), (145, "إهناسيا", 26), (146, "ببا", 26),
+					// New Valley (27)
+					(147, "الخارجة", 27), (148, "الداخلة", 27), (149, "الفرافرة", 27), (150, "باريس", 27),
+				};
+				foreach (var (id, name, gid) in cities)
+				{
+					await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO Cities (Id, Name, GovernorateId) VALUES ({0}, {1}, {2})", id, name, gid);
+				}
+				await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Cities OFF");
+				Console.WriteLine("Cities Seeded.");
+
+			}
+
+			await dbContext.SaveChangesAsync();
+			Console.WriteLine("--- Data Seeding Completed ---");
+		} catch (Exception ex) {
+			Console.WriteLine($"!!! SEEDING ERROR: {ex.Message}");
+			if (ex.InnerException != null) {
+				Console.WriteLine($"!!! INNER ERROR: {ex.InnerException.Message}");
+			}
+		}
+	}
+}

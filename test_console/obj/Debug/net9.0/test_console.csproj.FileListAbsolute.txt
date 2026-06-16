@@ -1,0 +1,4 @@
+D:\R3AIA PROJECT API\R3AIA PROJECT API\R3AIA\test_console\obj\Debug\net9.0\test_console.GeneratedMSBuildEditorConfig.editorconfig
+D:\R3AIA PROJECT API\R3AIA PROJECT API\R3AIA\test_console\obj\Debug\net9.0\test_console.AssemblyInfoInputs.cache
+D:\R3AIA PROJECT API\R3AIA PROJECT API\R3AIA\test_console\obj\Debug\net9.0\test_console.AssemblyInfo.cs
+D:\R3AIA PROJECT API\R3AIA PROJECT API\R3AIA\test_console\obj\Debug\net9.0\test_console.csproj.CoreCompileInputs.cache

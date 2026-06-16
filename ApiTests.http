@@ -1,0 +1,352 @@
+### Variables Definition
+@host = http://localhost:5129
+@contentType = application/json
+
+# 1. TOKEN SECTION - CHANGE THESE ONLY
+@patientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1OWNlZjY5Zi04ODNlLTRkZWEtYjBkZC1hOWRiMWE1ZTc5NmYiLCJ1bmlxdWVfbmFtZSI6ImVsX2pvbzEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjU5Y2VmNjlmLTg4M2UtNGRlYS1iMGRkLWE5ZGIxYTVlNzk2ZiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJzaGVuZGljbyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlBhdGllbnQiLCJleHAiOjE3NzA1NjQ1MzcsImlzcyI6IlIzQUlBLkFwaSIsImF1ZCI6IlIzQUlBLkNsaWVudHMifQ.aLjTV2C8hVQEGM0w4AdlmIsIdO-YZOtoYnwX2FwpEbk
+@doctorToken =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNWVjMmYzZC05YTcyLTRiMWYtYTkyNi04ZDgyZjMxMTk3YjciLCJ1bmlxdWVfbmFtZSI6ImRvY3RvcjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjA1ZWMyZjNkLTlhNzItNGIxZi1hOTI2LThkODJmMzExOTdiNyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJzaGVuZGljbyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkRvY3RvciIsImV4cCI6MTc3MDU2NjUxNSwiaXNzIjoiUjNBSUEuQXBpIiwiYXVkIjoiUjNBSUEuQ2xpZW50cyJ9.n6pQUaXXRq9pyeEKic2TXBUgaN3uAswlA7YYCZ8KaQU
+@pharmacyToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyMjQwMi03NzFlLTQ5M2QtOTRlOS0xNjVjNTM5OTc0NDYiLCJ1bmlxdWVfbmFtZSI6InBoYXJtYWN5MSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMTIzMjI0MDItNzcxZS00OTNkLTk0ZTktMTY1YzUzOTk3NDQ2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6InBoYXJtYWN5MiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlBoYXJtYWN5IiwiZXhwIjoxNzcwNTY2OTAzLCJpc3MiOiJSM0FJQS5BcGkiLCJhdWQiOiJSM0FJQS5DbGllbnRzIn0.o4BqaiYR4S9RgQcsn10cog6iNnjpaliU0eV8-VvsG5c
+@volunteerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYTgzYjRkOS0yZWU3LTQxODQtOWYyNC1iNzUwNzkzOTVkMWIiLCJ1bmlxdWVfbmFtZSI6InZvbHVudGVlcjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFhODNiNGQ5LTJlZTctNDE4NC05ZjI0LWI3NTA3OTM5NWQxYiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ2b2x1bnRlZXIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVm9sdW50ZWVyIiwiZXhwIjoxNzcwNTY3MTQxLCJpc3MiOiJSM0FJQS5BcGkiLCJhdWQiOiJSM0FJQS5DbGllbnRzIn0.RfXBB0-V-lCoQO4hwvEkQ7Yd0H-_EfdP_vKAZvWQtXg
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZDRmNWMxZi0wMjdkLTRlYTEtODA0Yi0yYzFlMGY5N2RjYTciLCJ1bmlxdWVfbmFtZSI6ImFkbWluQHIzYWlhLmxvY2FsIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJkZDRmNWMxZi0wMjdkLTRlYTEtODA0Yi0yYzFlMGY5N2RjYTciLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiUjNBSUEgQWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc3MDU2NzAxOCwiaXNzIjoiUjNBSUEuQXBpIiwiYXVkIjoiUjNBSUEuQ2xpZW50cyJ9.U5P_DTVxjpgdGGI3ZesmmK7hB45gQrposxXKV_ipA7o
+# 2. TEST DATA IDs - CHANGE THESE BASED ON YOUR DB
+@specId = 1
+@medRequestId = 1
+@medicineRequestId = 1002
+@reportedUserId = aa83b4d9-2ee7-4184-9f24-b75079395d1b
+@caseId = 1
+@reportId = 1
+@banUserId = PASTE_USER_ID_HERE
+
+########################################################
+## 1) AUTH - Register / Login
+########################################################
+
+### Register User
+POST {{host}}/api/Auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "volunteer2@example.com",
+  "userName": "volunteer2",
+  "fullName": "volunteer2",
+  "nationalID": "2902353322252321011",
+  "password": "Passw0rd@123",
+  "role": "volunteer"
+}
+
+### Login User
+POST {{host}}/api/Auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "pharmacy1@example.com",
+  "password": "Passw0rd@123"
+}
+
+########################################################
+## 2) Profiles - إكمال البيانات
+########################################################
+
+### Complete Patient Profile (مع رفع صور)
+# ملاحظة: تأكد من وجود الملفات nid_image.jpg و social_proof.jpg في مجلد R3AIA
+POST {{host}}/api/Profiles/patient
+Authorization: Bearer {{patientToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="FullName"
+
+shendico1
+--boundary
+Content-Disposition: form-data; name="PhoneNumber"
+
+01099999999
+--boundary
+Content-Disposition: form-data; name="GovernorateId"
+
+1
+--boundary
+Content-Disposition: form-data; name="CityId"
+
+1
+--boundary
+Content-Disposition: form-data; name="Address"
+
+cairo
+--boundary
+Content-Disposition: form-data; name="HasChronicDisease"
+
+false
+--boundary
+Content-Disposition: form-data; name="NIDImage"; filename="nid_image.jpg"
+Content-Type: image/jpeg
+
+< ./nid_image.jpg
+--boundary
+Content-Disposition: form-data; name="SocialProofImage"; filename="social_proof.jpg"
+Content-Type: image/jpeg
+
+< ./social_proof.jpg
+--boundary--
+
+### Complete Doctor Profile
+POST {{host}}/api/Profiles/doctor
+Authorization: Bearer {{doctorToken}}
+Content-Type: {{contentType}}
+
+{
+  "fullName": "Doctor jo",
+  "phoneNumber": "01234567890",
+  "specialtyId": {{specId}},
+  "governorateId": 1,
+  "cityId": 1,
+  "clinicAddress": "Clinic Address"
+}
+
+### Complete Pharmacy Profile
+POST {{host}}/api/Profiles/pharmacy
+Authorization: Bearer {{pharmacyToken}}
+Content-Type: {{contentType}}
+
+{
+  "pharmacyName": "Test Pharmacy",
+  "phoneNumber": "01000000002",
+  "governorateId": 1,
+  "cityId": 1,
+  "address": "Pharmacy address"
+}
+
+### Complete Volunteer Profile
+POST {{host}}/api/Profiles/volunteer
+Authorization: Bearer {{volunteerToken}}
+Content-Type: {{contentType}}
+
+{
+  "fullName": "ali",
+  "nationalID": "30002021260202022",
+  "phoneNumber": "01000000003",
+  "governorateId": 1
+}
+
+### Admin Verify User (To allow medicine requests)
+POST {{host}}/api/Admin/verify-user
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "userId": "{{reportedUserId}}",
+  "isApproved": true
+}
+
+########################################################
+## 3) Medicine Requests (Pharmacy & Delivery)
+########################################################
+
+### Create Medicine Request (Patient)
+# ملاحظة: يجب وجود ملف باسم prescription.jpg في نفس المجلد
+POST {{host}}/api/MedicineRequests
+Authorization: Bearer {{patientToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="PrescriptionImage"; filename="prescription.jpg"
+Content-Type: image/jpeg
+
+< ./prescriptio1n.jpg
+--boundary
+Content-Disposition: form-data; name="NeedDelivery"
+
+true
+--boundary--
+
+### Get Open Medicine Requests (Pharmacy)
+GET {{host}}/api/MedicineRequests/open
+Authorization: Bearer {{pharmacyToken}}
+
+### Accept Medicine Request (Pharmacy)
+POST {{host}}/api/MedicineRequests/accept/{{medicineRequestId}}
+Authorization: Bearer {{pharmacyToken}}
+Content-Type: {{contentType}}
+
+{
+  "pharmacyNotes": "الدواء جاهز للاستلام من الساعة 9 صباحاً"
+}
+
+### Get My Medicine Requests (Patient)
+GET {{host}}/api/MedicineRequests/my-requests
+Authorization: Bearer {{patientToken}}
+
+### Get Delivery Tasks (Volunteer)
+# يعرض مهام التوصيل المتاحة (التي لم يتم أخذها بعد)
+# بعد التعديل: يستثني الطلبات الموجودة في جدول DeliveryTasks
+GET {{host}}/api/MedicineRequests/delivery-tasks
+Authorization: Bearer {{volunteerToken}}
+
+### Take Delivery Task (Volunteer)
+# يأخذ مهمة توصيل
+# بعد التعديل: ينشئ سطر جديد في جدول DeliveryTasks
+# افحص جدول DeliveryTasks بعد تنفيذ هذا الطلب: SELECT * FROM DeliveryTasks
+POST {{host}}/api/MedicineRequests/take-delivery/{{medicineRequestId}}
+Authorization: Bearer {{volunteerToken}}
+
+### Mark As Delivered (Volunteer)
+# يؤكد إتمام التوصيل
+# بعد التعديل: يحدث DeliveryTask.TaskStatus إلى Delivered
+# افحص جدول DeliveryTasks: TaskStatus يجب أن تكون 2 (Delivered)
+POST {{host}}/api/MedicineRequests/mark-delivered/{{medicineRequestId}}
+Authorization: Bearer {{volunteerToken}}
+
+########################################################
+## 4) Medical Requests (Doctor & Patient)
+########################################################
+
+### Create Medical Request (Patient)
+POST {{host}}/api/MedicalRequests/create
+Authorization: Bearer {{patientToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="Description"
+
+عندي ألم شديد في البطن
+--boundary
+Content-Disposition: form-data; name="SpecialtyId"
+
+{{specId}}
+--boundary
+Content-Disposition: form-data; name="MedicalImages"; filename="xray.jpg"
+Content-Type: image/jpeg
+
+< ./xray.jpg
+--boundary--
+
+### Get Medical Requests for Doctor
+GET {{host}}/api/MedicalRequests/for-doctor
+Authorization: Bearer {{doctorToken}}
+
+### Get Medical Request Detail (Doctor)
+GET {{host}}/api/MedicalRequests/detail/{{medRequestId}}
+Authorization: Bearer {{doctorToken}}
+
+### Respond to Medical Request (Doctor)
+POST {{host}}/api/MedicalRequests/respond/{{medRequestId}}
+Authorization: Bearer {{doctorToken}}
+Content-Type: {{contentType}}
+
+{
+  "appointmentDate": "2026-02-15T14:00:00",
+  "doctorNotes": "يرجى الحضور في الموعد المحدد."
+}
+
+### Get My Medical Requests (Patient)
+GET {{host}}/api/MedicalRequests/my-requests
+Authorization: Bearer {{patientToken}}
+
+### Cancel Request (Patient)
+POST {{host}}/api/MedicalRequests/cancel/{{medRequestId}}
+Authorization: Bearer {{patientToken}}
+Content-Type: {{contentType}}
+
+{
+  "cancellationReason": "تحسنت حالتي"
+}
+
+### Cancel Request (Doctor)
+POST {{host}}/api/MedicalRequests/cancel-by-doctor/{{medRequestId}}
+Authorization: Bearer {{doctorToken}}
+Content-Type: {{contentType}}
+
+{
+  "cancellationReason": "ظرف طارئ"
+}
+
+########################################################
+## 5) Donations & Support
+########################################################
+
+### Get Donation Cases
+GET {{host}}/api/Donations/cases
+
+### Pay Donation
+POST {{host}}/api/Donations/pay
+Authorization: Bearer {{patientToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="CaseId"
+
+{{caseId}}
+--boundary
+Content-Disposition: form-data; name="Amount"
+
+100
+--boundary
+Content-Disposition: form-data; name="ReceiptImage"; filename="receipt.jpg"
+Content-Type: image/jpeg
+
+< ./receipt.jpg
+--boundary--
+
+### Create Support Report
+POST {{host}}/api/Support/report
+Authorization: Bearer {{patientToken}}
+Content-Type: {{contentType}}
+
+{
+  "reportedUserId": "{{reportedUserId}}",
+  "reason": "Inappropriate behavior"
+}
+
+### Get My Notifications
+GET {{host}}/api/Support/notifs
+Authorization: Bearer {{patientToken}}
+
+########################################################
+## 6) Admin Monitoring & Control
+########################################################
+
+### Get Stalled Requests
+GET {{host}}/api/Admin/stalled-requests?minutes=60
+Authorization: Bearer {{adminToken}}
+
+### Create Donation Case (Admin)
+POST {{host}}/api/Admin/create-case
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="Title"
+
+New Surgery Case
+--boundary
+Content-Disposition: form-data; name="Description"
+
+Critical condition
+--boundary
+Content-Disposition: form-data; name="GoalAmount"
+
+10000
+--boundary
+Content-Disposition: form-data; name="CaseImage"; filename="case.jpg"
+Content-Type: image/jpeg
+
+< ./case.jpg
+--boundary--
+
+### Resolve Report (Admin)
+PUT {{host}}/api/Admin/resolve-report
+Authorization: Bearer {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "reportId": {{reportId}},
+  "adminComment": "Resolved."
+}
+
+### Ban User
+POST {{host}}/api/Admin/ban-user/{{banUserId}}
+Authorization: Bearer {{adminToken}}
+
+### Unban User
+POST {{host}}/api/Admin/unban-user/{{banUserId}}
+Authorization: Bearer {{adminToken}}
