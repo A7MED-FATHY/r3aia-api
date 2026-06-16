@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\R3AIA PROJECT API\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj": {}
+    "D:\\R3AIA PROJECT API\\new project\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj": {}
   },
   "projects": {
-    "D:\\R3AIA PROJECT API\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj": {
+    "D:\\R3AIA PROJECT API\\new project\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\R3AIA PROJECT API\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj",
+        "projectUniqueName": "D:\\R3AIA PROJECT API\\new project\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj",
         "projectName": "test_console",
-        "projectPath": "D:\\R3AIA PROJECT API\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj",
+        "projectPath": "D:\\R3AIA PROJECT API\\new project\\R3AIA PROJECT API\\R3AIA\\test_console\\test_console.csproj",
         "packagesPath": "C:\\Users\\Ahmed Fathy\\.nuget\\packages\\",
-        "outputPath": "D:\\R3AIA PROJECT API\\R3AIA PROJECT API\\R3AIA\\test_console\\obj\\",
+        "outputPath": "D:\\R3AIA PROJECT API\\new project\\R3AIA PROJECT API\\R3AIA\\test_console\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
