@@ -18,6 +18,10 @@ namespace R3AIA
     {
         public static void Main(string[] args)
         {
+            // Enable legacy timestamp behavior so DateTime.Now (Local kind) works with PostgreSQL timestamptz columns.
+            // Without this, Npgsql 6+ throws: "Cannot write DateTime with Kind=Local to PostgreSQL type 'timestamp with time zone'"
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             var builder = WebApplication.CreateBuilder(args);
 
             // منع إعادة تسمية الـ Claims (sub, nameidentifier, role .. إلخ)
