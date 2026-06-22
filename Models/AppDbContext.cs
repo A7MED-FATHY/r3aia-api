@@ -76,7 +76,7 @@ namespace R3AIA.Models
 			builder.Entity<ApplicationUser>()
 				.HasIndex(u => u.NationalID)
 				.IsUnique()
-				.HasFilter("[NationalID] IS NOT NULL AND [NationalID] <> ''");
+				.HasFilter("\"NationalID\" IS NOT NULL AND \"NationalID\" <> ''");
 
 
 			// تعطيل الحذف التلقائي للمحافظة لمنع تداخل المسارات

@@ -47,7 +47,7 @@ namespace R3AIA
             });
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("R3AIA"));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("R3AIA"));
             });
 
             // Identity setup
