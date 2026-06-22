@@ -149,6 +149,13 @@ namespace R3AIA
 
             app.MapControllers();
 
+            // Apply pending migrations automatically on startup (required for Railway)
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+            }
+
             // Seed roles and default admin
             app.SeedAsync().GetAwaiter().GetResult();
 
