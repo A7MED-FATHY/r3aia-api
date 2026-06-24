@@ -84,9 +84,11 @@ namespace R3AIA.Controllers
 
             messages.Add(new { role = "user", content = request.Message });
 
-            // Try models with fallback
-            foreach (var model in FreeModels)
+            // Try models with fallback (max 3 attempts to avoid burning rate limits)
+            var modelsToTry = FreeModels.Take(3).ToArray();
+            for (int i = 0; i < modelsToTry.Length; i++)
             {
+                var model = modelsToTry[i];
                 try
                 {
                     var result = await CallModel(model, messages, apiKey);
@@ -97,10 +99,19 @@ namespace R3AIA.Controllers
                             return Ok(new { reply = cleaned });
                     }
                 }
+                catch (HttpRequestException ex) when (ex.Message.Contains("429"))
+                {
+                    Console.WriteLine($"Chat rate limited on {model}. Waiting before retry...");
+                    await Task.Delay(2000); // Wait 2 seconds on rate limit
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Chat model {model} error: {ex.Message}");
                 }
+
+                // Small delay between model attempts to avoid rate limit cascade
+                if (i < modelsToTry.Length - 1)
+                    await Task.Delay(500);
             }
 
             return StatusCode(503, new { error = "الخدمة غير متاحة حالياً، حاول لاحقاً" });
@@ -132,6 +143,9 @@ namespace R3AIA.Controllers
 
                 if ((int)response.StatusCode == 401 || (int)response.StatusCode == 403)
                     throw new UnauthorizedAccessException("Invalid API key");
+
+                if ((int)response.StatusCode == 429)
+                    throw new HttpRequestException("429 Rate Limited");
 
                 return null;
             }
